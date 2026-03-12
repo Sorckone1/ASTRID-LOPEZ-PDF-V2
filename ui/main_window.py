@@ -64,6 +64,11 @@ PAGE_SIZE_POINTS = {
 }
 
 
+def resource_path(relative_path: str) -> str:
+    base_path = getattr(sys, "_MEIPASS", os.path.abspath("."))
+    return os.path.join(base_path, relative_path)
+
+
 def collect_supported_files(paths: list[str]) -> list[str]:
     found = []
 
@@ -693,9 +698,10 @@ class MainWindow(QMainWindow):
         self.set_status("Listo para trabajar.")
 
     def load_fonts(self):
-        font_folder = os.path.join(os.getcwd(), "assets", "fonts")
+        font_folder = resource_path("assets/fonts")
         if not os.path.isdir(font_folder):
             return
+
         for file in os.listdir(font_folder):
             if file.lower().endswith(".ttf"):
                 QFontDatabase.addApplicationFont(os.path.join(font_folder, file))
@@ -880,7 +886,7 @@ class MainWindow(QMainWindow):
         file_layout.setSpacing(8)
 
         file_icon = QLabel()
-        icon_path = os.path.join("assets", "icons", "carpeta.png")
+        icon_path = resource_path("assets/icons/carpeta.png")
         pixmap = QPixmap(icon_path)
         if not pixmap.isNull():
             pixmap = pixmap.scaled(22, 22, Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -994,14 +1000,9 @@ class MainWindow(QMainWindow):
             self.current_banner = None
 
         banner = SuccessBanner(self.centralWidget(), text)
-        shadow = QGraphicsDropShadowEffect(banner)
-        shadow.setBlurRadius(38)
-        shadow.setOffset(0, 10)
-        shadow.setColor(QColor(180, 140, 160, 110))
 
         opacity = QGraphicsOpacityEffect(banner)
         opacity.setOpacity(0.0)
-
         banner.setGraphicsEffect(opacity)
 
         x = (self.centralWidget().width() - banner.width()) // 2
